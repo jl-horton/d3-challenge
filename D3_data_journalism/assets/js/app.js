@@ -1,11 +1,11 @@
 // define svg area
-var svgWidth = 960;
-var svgHeight = 500;
+var svgWidth = 900;
+var svgHeight = 600;
 
 var margin = {
   top: 20,
   right: 40,
-  bottom: 80,
+  bottom: 120,
   left: 100
 };
 
@@ -14,8 +14,7 @@ var chartHeight = svgHeight - margin.top - margin.bottom;
 
 // Create an SVG wrapper, append an SVG group that will hold our chart,
 // and shift the latter by left and top margins.
-var svg = d3
-  .select(".scatter")
+var svg = d3.select("#scatter")
   .append("svg")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
@@ -32,8 +31,8 @@ var chosenYAxis = "healthcare";
 function xScale(healthData, chosenXAxis) {
   // create scales
   var xLinearScale = d3.scaleLinear()
-    .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.8,
-      d3.max(healthData, d => d[chosenXAxis]) * 1.2
+    .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.85,
+      d3.max(healthData, d => d[chosenXAxis]) * 1.15
     ])
     .range([0, chartWidth]);
 
@@ -44,8 +43,8 @@ function xScale(healthData, chosenXAxis) {
 function yScale(healthData, chosenYAxis) {
     // create scales
     var yLinearScale = d3.scaleLinear()
-      .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8,
-        d3.max(healthData, d => d[chosenYAxis]) * 1.2
+      .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.85,
+        d3.max(healthData, d => d[chosenYAxis]) * 1.15
       ])
       .range([0, chartHeight]);
   
@@ -73,10 +72,8 @@ function renderX(newXScale, xAxis) {
 // function used for updating circles group with a transition to
 // new circles
 function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
-
-    circlesGroup
-      .transition()
-      .duration(1000)
+    circlesGroup.transition()
+      .duration(2000)
       .attr("cx", d => newXScale(d[chosenXAxis]))
       .attr("cy", d => newYScale(d[chosenYAxis]))
     return circlesGroup;
@@ -84,8 +81,7 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
 
   // Update the labels with state abbreviations
 function renderText(textGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
-    textGroup
-      .transition()
+    textGroup.transition()
       .duration(2000)
       .attr("x", d => newXScale(d[chosenXAxis]))
       .attr("y", d => newYScale(d[chosenYAxis]))
@@ -120,15 +116,15 @@ function styleX(value, chosenXAxis) {
         var yLabel = "No Healthcare: "; 
     }
     else if (chosenYAxis ==="obesity") {
-        var yLabel = "Obesity";
+        var yLabel = "Obesity:";
     }
     else {
-        var yLabel = "Smokers";
+        var yLabel = "Smokers:";
     }
 
     var toolTip = d3.tip()
       .attr("class", "d3-tip")
-      .offset([80, -60])
+      .offset([-8, 0])
       .html(function(d) {
         return (`${d.state}<br>${xLabel} ${styleX(d[selectedX], selectedX)}<br>${yLabel} ${d[selectedY]}%`);
       });
@@ -169,7 +165,7 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
 
      // append x axis
     var xAxis = chartGroup.append("g")
-    .classed("x-axis", true)
+    .classed("x-axis", true)  
     .attr("transform", `translate(0, ${chartHeight})`)
     .call(bottomAxis);
 
@@ -186,8 +182,8 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .classed("stateCircle", true)
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 20)
-    .attr("opacity", ".5");
+    .attr("r", 12)
+    .attr("opacity", 0.9);
 
     // Create group for labels
     var textGroup = chartGroup.selectAll(".stateText")
@@ -213,7 +209,7 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .text("In Poverty %");
 
     var ageLabel = xlabelsGroup.append("text")
-    .classed("active", true)
+    .classed("inactive", true)
     .classed("aText", true)
     .attr("x", 0)
     .attr("y", 20)
@@ -221,8 +217,8 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .text("Age (Median)");
 
     var incomeLabel = xlabelsGroup.append("text")
-    .classed("active", true)
     .classed("aText", true)
+    .classed("inactive", true)
     .attr("x", 0)
     .attr("y", 20)
     .attr("value", "income") // value to grab for event listener
@@ -232,29 +228,29 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .attr("transform", `translate(${0 - margin.left/4}, ${chartHeight/2})`);
 
     var healthcareLabel = ylabelsGroup.append("text")
-    .classed("active", true)
     .classed("aText", true)
-    .attr("x", 0)
-    .attr("y", 20)
+    .classed("active", true)
+    .attr("x", 0 - 20)
+    .attr("y", 0)
     .attr("transform", "rotate(-90)")
     .attr("value", "healthcare") // value to grab for event listener
     .text("Lacks Healthcare");
 
     var smokesLabel = ylabelsGroup.append("text")
-    .classed("active", true)
     .classed("aText", true)
-    .attr("x", 0)
-    .attr("y", 20)
+    .classed("inactive", true)
     .attr("transform", "rotate(-90)")
+    .attr("x", 0 - 40)
+    .attr("y", 0)  
     .attr("value", "smokes") // value to grab for event listener
-    .text("Smokes %");
+    .text("Smoker %");
 
     var obesityLabel = ylabelsGroup.append("text")
-    .classed("active", true)
     .classed("aText", true)
-    .attr("x", 0)
-    .attr("y", 20)
+    .classed("inactive", true)
     .attr("transform", "rotate(-90)")
+    .attr("x", 0 - 60)
+    .attr("y", 0)
     .attr("value", "obesity") // value to grab for event listener
     .text("Obese %");
 
@@ -275,7 +271,7 @@ xlabelsGroup.selectAll("text")
     xLinearScale = xScale(healthData, chosenXAxis);
 
     // updates x axis with transition
-    xAxis = renderAxes(xLinearScale, xAxis);
+    xAxis = renderX(xLinearScale, xAxis);
 
     // updates circles with new x values
     circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
@@ -288,37 +284,19 @@ xlabelsGroup.selectAll("text")
 
     // changes classes to change bold text
     if (chosenXAxis === "poverty") {
-      povertyLabel
-        .classed("active", true)
-        .classed("inactive", false);
-      ageLabel
-        .classed("active", false)
-        .classed("inactive", true);  
-      incomeLabel
-        .classed("active", false)
-        .classed("inactive", true);
+      povertyLabel.classed("active", true).classed("inactive", false);
+      ageLabel.classed("active", false).classed("inactive", true);  
+      incomeLabel.classed("active", false).classed("inactive", true);
     }
-    else if (chosenYAxis === "age") {
-      povertyLabel
-        .classed("active", false)
-        .classed("inactive", true);
-      ageLabel
-        .classed("active", true)
-        .classed("inactive", false);
-      incomeLabel
-        .classed("active", false)
-        .classed("inactive", true);
+    else if (chosenXAxis === "age") {
+      povertyLabel.classed("active", false).classed("inactive", true);
+      ageLabel.classed("active", true).classed("inactive", false);
+      incomeLabel.classed("active", false).classed("inactive", true);
     }
     else {
-      povertyLabel
-        .classed("active", false)
-        .classed("inactive", true);
-      ageLabel
-        .classed("active", false)
-        .classed("inactive", true);
-      incomeLabel
-        .classed("active", true)
-        .classed("inactive", false);
+      povertyLabel.classed("active", false).classed("inactive", true);
+      ageLabel.classed("active", false).classed("inactive", true);
+      incomeLabel.classed("active", true).classed("inactive", false);
     }
   }
 });
@@ -337,10 +315,10 @@ ylabelsGroup.selectAll("text")
 
     // functions here found above csv import
     // updates x scale for new data
-    xLinearScale = xScale(healthData, chosenYAxis);
+    yLinearScale = yScale(healthData, chosenYAxis);
 
     // updates x axis with transition
-    yAxis = renderY(xLinearScale, yAxis);
+    yAxis = renderY(yLinearScale, yAxis);
 
     // updates circles with new x values
     circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
@@ -353,37 +331,19 @@ ylabelsGroup.selectAll("text")
 
     // changes classes to change bold text
     if (chosenYAxis === "healthcare") {
-      healthcareLabel
-        .classed("active", true)
-        .classed("inactive", false);
-      smokesLabel
-        .classed("active", false)
-        .classed("inactive", true);  
-      obesityLabel
-        .classed("active", false)
-        .classed("inactive", true);
+      healthcareLabel.classed("active", true).classed("inactive", false);
+      smokesLabel.classed("active", false).classed("inactive", true);  
+      obesityLabel.classed("active", false).classed("inactive", true);
     }
     else if (chosenYAxis === "smokes") {
-      healthcareLabel
-        .classed("active", false)
-        .classed("inactive", true);
-      smokesLabel
-        .classed("active", true)
-        .classed("inactive", false);
-      obesityLabel
-        .classed("active", false)
-        .classed("inactive", true);
+      healthcareLabel.classed("active", false).classed("inactive", true);
+      smokesLabel.classed("active", true).classed("inactive", false);
+      obesityLabel.classed("active", false).classed("inactive", true);
     }
     else {
-      healthcareLabel
-        .classed("active", false)
-        .classed("inactive", true);
-      smokesLabel
-        .classed("active", false)
-        .classed("inactive", true);
-      obesityLabel
-        .classed("active", true)
-        .classed("inactive", false);
+      healthcareLabel.classed("active", false).classed("inactive", true);
+      smokesLabel.classed("active", false).classed("inactive", true);
+      obesityLabel.classed("active", true).classed("inactive", false);
     }
   }
 });
