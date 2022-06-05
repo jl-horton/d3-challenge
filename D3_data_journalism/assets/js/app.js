@@ -46,7 +46,7 @@ function yScale(healthData, chosenYAxis) {
       .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.85,
         d3.max(healthData, d => d[chosenYAxis]) * 1.15
       ])
-      .range([0, chartHeight]);
+      .range([chartHeight, 0]);
   
     return yLinearScale;
 }
@@ -126,7 +126,7 @@ function styleX(value, chosenXAxis) {
       .attr("class", "d3-tip")
       .offset([-8, 0])
       .html(function(d) {
-        return (`${d.state}<br>${xLabel} ${styleX(d[selectedX], selectedX)}<br>${yLabel} ${d[selectedY]}%`);
+        return (`${d.state}<br>${xLabel} ${styleX(d[chosenXAxis], chosenXAxis)}<br>${yLabel} ${d[chosenYAxis]}%`);
       });
   
     circlesGroup.call(toolTip);
@@ -195,7 +195,7 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .attr("y", d => yLinearScale(d[chosenYAxis]))
     .attr('dy', 3)
     .attr("font-size", 12)
-    .attr(d => d.abbr);
+    .text(d => d.abbr);
 
     var xlabelsGroup = chartGroup.append("g")
     .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top})`);
@@ -204,7 +204,7 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .classed("active", true)
     .classed("aText", true)
     .attr("x", 0)
-    .attr("y", 20)
+    .attr("y", 40)
     .attr("value", "poverty") // value to grab for event listener
     .text("In Poverty %");
 
@@ -212,7 +212,7 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .classed("inactive", true)
     .classed("aText", true)
     .attr("x", 0)
-    .attr("y", 20)
+    .attr("y", 60)
     .attr("value", "age") // value to grab for event listener
     .text("Age (Median)");
 
@@ -230,8 +230,8 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     var healthcareLabel = ylabelsGroup.append("text")
     .classed("aText", true)
     .classed("active", true)
-    .attr("x", 0 - 20)
-    .attr("y", 0)
+    .attr("y", 0 - 20)
+    .attr("x", 0)
     .attr("transform", "rotate(-90)")
     .attr("value", "healthcare") // value to grab for event listener
     .text("Lacks Healthcare");
@@ -240,8 +240,8 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .classed("aText", true)
     .classed("inactive", true)
     .attr("transform", "rotate(-90)")
-    .attr("x", 0 - 40)
-    .attr("y", 0)  
+    .attr("y", 0 - 40)
+    .attr("x", 0)  
     .attr("value", "smokes") // value to grab for event listener
     .text("Smoker %");
 
@@ -249,8 +249,8 @@ d3.csv("./assets/data/data.csv").then(function(healthData) {
     .classed("aText", true)
     .classed("inactive", true)
     .attr("transform", "rotate(-90)")
-    .attr("x", 0 - 60)
-    .attr("y", 0)
+    .attr("y", 0 - 60)
+    .attr("x", 0)
     .attr("value", "obesity") // value to grab for event listener
     .text("Obese %");
 
